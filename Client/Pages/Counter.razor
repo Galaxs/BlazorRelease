@@ -1,0 +1,24 @@
+﻿@page "/counter"
+
+<p>Current count: @currentCount</p>
+
+<button disabled="@(currentCount >= 1000)" class="btn btn-primary" @onclick="IncrementCount">Increase</button>
+<!-- <button disabled="@(currentCount <= 0)" class="btn btn-primary" @onclick="(() => currentCount--)">Decrease</button> -->
+<br/>
+<br/>
+<input type="number" value="@increment" onchange="@((UIChangeEventArgs e) => increment = int.Parse($"{e.Value}")) " />
+
+
+@code {
+    int currentCount = 0;
+    int increment = 12;
+    /**    private void Decrement()
+        {
+            currentCount--;
+        }
+    **/
+    private void IncrementCount()
+    {
+        currentCount += increment;
+    }
+}

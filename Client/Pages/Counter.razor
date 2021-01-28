@@ -1,24 +1,68 @@
 ﻿@page "/counter"
+<h2 class="thead-dark">Increment and Binding the DOM.</h2>
+<p class="@backgroundColor">
+    This demonstrates the data binding alternating between css class of the span container.<br />
+    The Increase button will be desabled if is >= 1000.
+    and the autoincrement button will do exackly that, plus the increment.
+</p>
+<p>Current count:<span class="@backgroundColor">@currentCount</span></p>
 
-<p>Current count: @currentCount</p>
-
-<button disabled="@(currentCount >= 1000)" class="btn btn-primary" @onclick="IncrementCount">Increase</button>
 <!-- <button disabled="@(currentCount <= 0)" class="btn btn-primary" @onclick="(() => currentCount--)">Decrease</button> -->
-<br/>
-<br/>
-<input type="number" value="@increment" onchange="@((UIChangeEventArgs e) => increment = int.Parse($"{e.Value}")) " />
+<br />
+<br />
+<label>Increment:  </label><input type="number" @bind="increment" /><br />
+<p>Today is <input @bind="someDate" @bind:format="dd-MM-yyyy" /></p>
 
+<p>Auto increment to prove that background threats don't update the DOM</p>
+<p>StateHasChanged(); will update the DOM.</p>
+<input type="number" @bind="autoIncrementCount" />
+<button disabled="@(currentCount >= 1000)" class="btn btn-primary" @onclick="IncrementCount">Increase</button>
+<button class="btn btn-success" disabled="@(lockerBool == true)" @onclick="AutoIncrement">Start</button>
+<button class="btn btn-dark" disabled="@(lockerBool == false)" @onclick="StopAutoIncrement">Cancel</button>
 
-@code {
+@code{
+    bool lockerBool = false;
+    string backgroundColor = "red-background";
     int currentCount = 0;
-    int increment = 12;
+    int increment = 1;
+    int autoIncrementCount = 0;
+    private DateTime someDate = DateTime.Now;
+    System.Threading.Timer timer2;
+
+
     /**    private void Decrement()
         {
             currentCount--;
         }
     **/
+
+    // auto-increment
+    private void StopAutoIncrement()
+    {
+        // TO DO ... stop the timer/thread
+        timer2.Dispose();
+        lockerBool = !lockerBool;
+    }
+    private void AutoIncrement()                        // TO DO: stop the threading timer.
+    {
+        
+       var timer = new System.Threading.Timer((b) =>
+        {
+            IncrementCount();
+            StateHasChanged();
+        }, null, TimeSpan.FromSeconds(1),
+              TimeSpan.FromSeconds(1));
+        lockerBool = !lockerBool;
+        timer2 = timer;
+
+    }
     private void IncrementCount()
     {
+
         currentCount += increment;
+        autoIncrementCount += increment;
+        backgroundColor = (currentCount % 2 == 0) ?
+       "red-background" : "yellow-background";
+        currentCount = currentCount == 4 ? currentCount = 0 : currentCount++;
     }
 }

@@ -7,18 +7,28 @@
 </p>
 <p>Current count:<span class="@backgroundColor">@currentCount</span></p>
 
+<button disabled="@(currentCount >= 1000)" class="btn btn-primary" @onclick="IncrementCount">Increase</button>
 <!-- <button disabled="@(currentCount <= 0)" class="btn btn-primary" @onclick="(() => currentCount--)">Decrease</button> -->
 <br />
 <br />
-<label>Increment:  </label><input type="number" @bind="increment" /><br />
+<label>Increment:  </label><input type="number" @bind="increment"
+ @onkeypress="KeyHandler"  @onkeypress:preventDefault="true"/><p>Here the + and - keys are bind to triguer a event method that decrease and increase the value of the imput.</p> <br />
 <p>Today is <input @bind="someDate" @bind:format="dd-MM-yyyy" /></p>
 
 <p>Auto increment to prove that background threats don't update the DOM</p>
 <p>StateHasChanged(); will update the DOM.</p>
 <input type="number" @bind="autoIncrementCount" />
-<button disabled="@(currentCount >= 1000)" class="btn btn-primary" @onclick="IncrementCount">Increase</button>
 <button class="btn btn-success" disabled="@(lockerBool == true)" @onclick="AutoIncrement">Start</button>
 <button class="btn btn-dark" disabled="@(lockerBool == false)" @onclick="StopAutoIncrement">Cancel</button>
+<br /><br /><br /><div style="width: 400px; height: 400px; background: yellow"
+     @onmousemove="OuterMouseMove">
+    @outerPos
+    <div style="width: 300px; height: 300px;
+ background: green; margin:50px"
+         @onmousemove="InnerMouseMove">
+        @innerPos
+    </div>
+</div>
 
 @code{
     bool lockerBool = false;
@@ -35,25 +45,47 @@
             currentCount--;
         }
     **/
+    // mouse bindig
+    private string outerPos = "Nothing yet";
+    private void OuterMouseMove(MouseEventArgs e)
+     => outerPos = $"Mouse last at {e.ClientX}x{e.ClientY}";
+    private string innerPos = "Nothing yet";
+    private void InnerMouseMove(MouseEventArgs e)
+     => innerPos = $"Mouse last at {e.ClientX}x{e.ClientY}";
+
+
+
+    // Keys event handlers
+    private void KeyHandler(KeyboardEventArgs e)
+    {
+        Console.WriteLine(e.Code);
+        if (e.Key == "+")
+        {
+            increment += 1;
+        }
+        if (e.Key == "-")
+        {
+            increment -= 1;
+        }
+    }
 
     // auto-increment
     private void StopAutoIncrement()
     {
-        // TO DO ... stop the timer/thread
         timer2.Dispose();
-        lockerBool = !lockerBool;
     }
     private void AutoIncrement()                        // TO DO: stop the threading timer.
     {
-        
-       var timer = new System.Threading.Timer((b) =>
+
+        var timer = new System.Threading.Timer((b) =>
         {
             IncrementCount();
             StateHasChanged();
         }, null, TimeSpan.FromSeconds(1),
-              TimeSpan.FromSeconds(1));
+               TimeSpan.FromSeconds(1));
         lockerBool = !lockerBool;
         timer2 = timer;
+        timer.Dispose();
 
     }
     private void IncrementCount()

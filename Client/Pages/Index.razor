@@ -1,8 +1,25 @@
 ﻿@page "/"
+@using BlazorRelease.Client.Pages
+<DismissableAlert @ref="alert" @bind-Show="@ShowAlert">
+    <span class="oi oi-check mr-2" aria-hidden="true"></span>
+    <strong>Blazor is soo cool!</strong>
+</DismissableAlert>
+<Timer TimeInSeconds="5" Tick="@(() => alert.Dismiss())" />
+<button @onclick="@ToggleAlert">Toggle</button>
+<GrandMother>
 
-<h1>Hello, world!</h1>
-
-Welcome to this new way to present your content. 😊
-<Router AppAssembly=typeof(Program).Assembly/>
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+    <GrandChild />
+        <DismissableAlert Show="true">
+            <GrandChild />
+        </DismissableAlert>
+    <GrandChild/>
+</GrandMother>
+@code {
+    DismissableAlert x;
+    private DismissableAlert alert;
+    public bool ShowAlert { get; set; } = true;
+    public void ToggleAlert()
+    {
+        ShowAlert = !ShowAlert;
+    }
+}
